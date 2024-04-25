@@ -31,16 +31,43 @@ void closeGripper() {
 
 // Función para moverse a la posición inicial 
 void mover_posIni() {
-  Braccio.ServoMovement( base_home, shoulder_home, elbow_home, wrist_rot_home, wrist_ver_home, gripper_home );
+  Braccio.ServoMovement(200, base_home, shoulder_home, elbow_home, wrist_rot_home, wrist_ver_home, gripper_home );
+}
+//Función mueverobot
+void mueverobot_girar(){
+
+}
+//Funcion coger bola
+void coger_bola(){
+
+}
+
+void mover_pos_tirar(){
+
+}
+void tirar_bola(){
+
+}
+int medirDistancia(){
+
 }
 
 
 void setup() {
-  // put your setup code here, to run once:
-
+    mover_posIni();
+  
 }
-
 void loop() {
-  // put your main code here, to run repeatedly:
+  mueverobot_girar();
+  int distancia = medirDistancia();
+  Serial.println(distancia);
+  if (distancia<20){
+    openGripper();
+    coger_bola();
+    closeGripper();
+    mover_pos_tirar();
+    tirar_bola();
+  }
 
 }
+
