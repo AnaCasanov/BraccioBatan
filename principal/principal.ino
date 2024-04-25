@@ -1,6 +1,7 @@
 #include <Servo.h>
 #include <Braccio.h>
-
+int TRIG = 10;
+int ECO = 9;
 
 // Crear objetos de servos para cada articulación
 Servo base;
@@ -9,12 +10,12 @@ Servo elbow;
 Servo wrist_rot;
 Servo wrist_ver;
 Servo gripper;
-  const int base_home= 0;
-  const int shoulder_home= 40;
-  const int elbow_home= 180;
-  const int wrist_rot_home= 0;
-  const int wrist_ver_home= 170;
-  const int gripper_home= 72;
+const int base_home= 0;
+const int shoulder_home= 40;
+const int elbow_home= 180;
+const int wrist_rot_home= 0;
+const int wrist_ver_home= 170;
+const int gripper_home= 72;
 
   
 // Función para abrir la pinza del Braccio
@@ -48,14 +49,23 @@ void mover_pos_tirar(){
 void tirar_bola(){
 
 }
-int medirDistancia(){
 
+//Función de detectar distancia
+int medirDistancia(){
+  digitalWrite(TRIG, HIGH);
+  delay(1);
+  digitalWrite(TRIG, LOW);
+  int duracion = pulseIn(ECO, HIGH);
+  int distancia = duracion / 58.2;
+  return distancia;  
 }
 
 
 void setup() {
-    mover_posIni();
-  
+  mover_posIni();
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECO, INPUT);
+  Braccio.begin();
 }
 void loop() {
   mueverobot_girar();
