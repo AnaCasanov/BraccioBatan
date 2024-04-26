@@ -7,40 +7,39 @@ int ECO = 9;
 Servo base;
 Servo shoulder;
 Servo elbow;
-Servo wrist_rot;
 Servo wrist_ver;
+Servo wrist_rot;
 Servo gripper;
+
 const int base_home= 0;
 const int shoulder_home= 40;
 const int elbow_home= 180;
-const int wrist_rot_home= 0;
 const int wrist_ver_home= 170;
+const int wrist_rot_home= 0;
 const int gripper_home= 72;
 const int base_girar= 1 ;
   
 // Función para abrir la pinza del Braccio
 void openGripper() {
- Braccio.ServoMovement(500, base.read(), shoulder.read(), elbow.read(), 
-                       wrist_rot.read(), wrist_ver.read(), 10);
+ Braccio.ServoMovement(500, base.read(), shoulder.read(), elbow.read(),wrist_ver.read, wrist_rot.read(), 10);
 }
 
 // Función para cerrar la pinza del Braccio
 void closeGripper() {
- Braccio.ServoMovement(500, base.read(), shoulder.read(), elbow.read(), 
-                       wrist_rot.read(), wrist_ver.read(), 73);
+ Braccio.ServoMovement(500, base.read(), shoulder.read(), elbow.read(), wrist_ver.read(), wrist_rot.read(), 73);
 }
 
 // Función para moverse a la posición inicial 
 void mover_posIni() {
-  Braccio.ServoMovement(200, base_home, shoulder_home, elbow_home, wrist_rot_home, wrist_ver_home, gripper_home );
+  Braccio.ServoMovement(200, base_home, shoulder_home, elbow_home, wrist_ver_home, wrist_rot_home, gripper_home );
 }
 //Función que hace girar el robot
 void mueverobot_girar(){
-  Braccio.ServoMovement (220, base.read()+base_girar, shoulder.read(), elbow.read(), wrist_rot.read(), wrist_ver.read(), gripper.read() ); 
+  Braccio.ServoMovement (220, base.read()+base_girar, shoulder.read(), elbow.read(), wrist_ver.read(), wrist_rot.read(), gripper.read() ); 
 }
 //Funcion coger bola
 void coger_bola(){
-
+  Braccio.ServoMovement(200, base.read(), shoulder_coger, elbow.read(), wrist_ver.read(), wrist_rot.read(), gripper_abrir);
 }
 
 void mover_pos_tirar(){
