@@ -16,7 +16,7 @@ const int elbow_home= 180;
 const int wrist_rot_home= 0;
 const int wrist_ver_home= 170;
 const int gripper_home= 72;
-
+const int base_girar= 1 ;
   
 // Función para abrir la pinza del Braccio
 void openGripper() {
@@ -34,9 +34,9 @@ void closeGripper() {
 void mover_posIni() {
   Braccio.ServoMovement(200, base_home, shoulder_home, elbow_home, wrist_rot_home, wrist_ver_home, gripper_home );
 }
-//Función mueverobot
+//Función que hace girar el robot
 void mueverobot_girar(){
-
+  Braccio.ServoMovement (220, base.read()+base_girar, shoulder.read(), elbow.read(), wrist_rot.read(), wrist_ver.read(), gripper.read() ); 
 }
 //Funcion coger bola
 void coger_bola(){
