@@ -24,14 +24,14 @@ int girando_reloj = 1;
 //Grados de gripper para abrir o cerrar pinza
 const int gripper_abrir=10;
 const int gripper_cerrar=72;
+
 //Posición de coger la bola
 const int shoulder_coger = 80;
 const int elbow_coger = 180;
 const int wrist_rot_coger = 5;
 //Posición de buscar la bola
-const int shoulder_buscar = 70;
+const int shoulder_buscar = 83;
 const int elbow_buscar = 180;
-const int wrist_rot_buscar = 0;
 //Posición de tirar
 const int elbow_tirar=100; //Menor numero mas estirado
 const int wrist_tirar=40; //Mayor numero mas estirado
@@ -61,10 +61,6 @@ void mover_pos_ini() {
 void coger_bola(){
   Braccio.ServoMovement(100, base.read(), shoulder_coger, elbow_coger, wrist_rot_coger, wrist_ver.read(), gripper.read());
 }
-//Funcion buscar bola
-void buscar_bola(){
-  Braccio.ServoMovement(100, base.read(), shoulder_buscar, elbow_buscar, wrist_rot_buscar, wrist_ver.read(), gripper.read());
-}
 
 
 /*FUNCIONES TIRAR BOLA -> No funcionan*/
@@ -80,19 +76,19 @@ void tirar_bola() {
 
 /*BARRIDO ROBOT*/
 //Función que hace girar el robot
-void girar_robot(){
+void barrido_robot(){
   int base_pos=base.read();
-  if (base_pos>175){
+  if (base_pos>179){
     girando_reloj=0;
   }
-  else if (base_pos<5) {
+  else if (base_pos<1) {
     girando_reloj=1;
   }
   if (girando_reloj==1) {
-    Braccio.ServoMovement (10, base.read()+base_girar, shoulder.read(), elbow.read(), wrist_rot.read(), wrist_ver.read(), gripper.read());
+    Braccio.ServoMovement (5, base.read()+base_girar, shoulder_buscar, elbow_buscar, wrist_rot_home, wrist_ver_home, gripper_abrir);
   }
   else {
-    Braccio.ServoMovement (10, base.read()-base_girar, shoulder.read(), elbow.read(), wrist_rot.read(), wrist_ver.read(), gripper.read());
+    Braccio.ServoMovement (5, base.read()-base_girar, shoulder_buscar, elbow_buscar, wrist_rot_home, wrist_ver_home, gripper_abrir);
   }
 }
 
@@ -106,7 +102,6 @@ int medirDistancia(){
   return distancia;  
 }
 
-
 void setup() {
   Braccio.begin();
   Serial.begin(9600);
@@ -116,24 +111,7 @@ void setup() {
 }
 void loop() {
   abrir_pinza();
-  buscar_bola();
-  //coger_bola(); //quitar de bucle pasar a setup??
-  //cerrar_pinza();
-  girar_robot();
-  int distancia = medirDistancia();
-  if (distancia< 15){
-    Serial.println("Hay bola");
-  }
-  Serial.println(distancia);
-
-  /*if (distancia<20){
-    abrir_pinza();
-    coger_bola();
-    cerrar_pinza();
-    mover_pos_tirar();
-    tirar_bola();
-  //}*/
-  delay(100);
-
+  barrido_robot();
+  delay(50);
 }
 
