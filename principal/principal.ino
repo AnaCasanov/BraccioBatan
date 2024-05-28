@@ -9,87 +9,48 @@ Servo wrist_rot; //pin 6, de 0 a 180
 Servo wrist_ver; //Pin 5, de 0 a 180
 Servo gripper; //Pin 3, de 10 a 73
 
-//Posición de origen = Posición de búsqueda
-const int base_home= 0;
-const int shoulder_home= 40;
-const int elbow_home= 180;
-const int wrist_ver_home= 170;
-const int wrist_rot_home= 0;
-const int gripper_home = 73;
-
-//Grados que gira en cada iteración
-const int base_girar= 5 ;
-int girando_reloj = 1;
-
 //Grados de gripper para abrir o cerrar pinza
 const int gripper_abrir=10;
 const int gripper_cerrar=72;
 
-//Posición de coger la bola
-const int shoulder_coger = 80;
+//Posiciones varias
+const int base_coger = 90;
+const int shoulder_coger = 85;
 const int elbow_coger = 180;
-const int wrist_rot_coger = 5;
-//Posición de buscar la bola
-const int shoulder_buscar = 83;
-const int elbow_buscar = 180;
-//Posición de tirar
-const int elbow_tirar=100; //Menor numero mas estirado
-const int wrist_tirar=40; //Mayor numero mas estirado
+const int wrist_rot_coger = 13;
+const int wrist_ver_coger = 90;
+
+const int base_dejar = 90;
+const int shoulder_dejar = 80;
+const int elbow_dejar = 180; // de 0 a 180, 180 más bajo, 170 más alto
+const int wrist_rot_dejar = 90; // 0 a 180
+const int wrist_ver_dejar = 90;
 
 //Pines para leer sensor de profundidad
 int TRIG = 8;
 int ECO = 7;
 
+//Rango distancias bola encontrada
+int d_max = 13;
+int d_min = 10;
+
 /*FUNCIONES PINZA*/
 // Función para abrir la pinza del Braccio
 void abrir_pinza() {
- Braccio.ServoMovement(1, base.read(), shoulder.read(), elbow.read(),wrist_rot.read(), wrist_ver.read(), gripper_abrir);
+ Braccio.ServoMovement(100, base.read(), shoulder.read(), elbow.read(),wrist_rot.read(), wrist_ver.read(), gripper_abrir);
 }
-
 // Función para cerrar la pinza del Braccio
 void cerrar_pinza() {
-  Braccio.ServoMovement(1, base.read(), shoulder.read(), elbow.read(), wrist_rot.read(), wrist_ver.read(), gripper_cerrar);
+  Braccio.ServoMovement(100, base.read(), shoulder.read(), elbow.read(), wrist_rot.read(), wrist_ver.read(), gripper_cerrar);
 }
 
 /*FUNCIONES MOVIMIENTO*/
-// Función para moverse a la posición inicial 
-void mover_pos_ini() {
-  Braccio.ServoMovement(200, base_home, shoulder_home, elbow_home, wrist_rot_home, wrist_ver_home, gripper_home );
+void pos_coger(){
+  Braccio.ServoMovement(500, base_coger, shoulder_coger, elbow_coger, wrist_rot_coger, wrist_ver_coger, gripper.read());
 }
 
-//Funcion coger bola
-void coger_bola(){
-  Braccio.ServoMovement(100, base.read(), shoulder_coger, elbow_coger, wrist_rot_coger, wrist_ver.read(), gripper.read());
-}
-
-
-/*FUNCIONES TIRAR BOLA -> No funcionan*/
-void mover_pos_tirar() {
-  Braccio.ServoMovement(600, base.read(), shoulder_home, elbow_tirar, wrist_tirar, wrist_ver.read(), gripper.read());
-
-}
-
-void tirar_bola() {
-  Braccio.ServoMovement(3, base.read(), shoulder.read(), elbow_tirar+50, wrist_tirar, wrist_ver.read(), gripper.read());
-  Braccio.ServoMovement(3, base.read(), shoulder.read(), elbow_tirar+100, 10, wrist_ver.read(), gripper_abrir);
-}
-
-/*BARRIDO ROBOT*/
-//Función que hace girar el robot
-void barrido_robot(){
-  int base_pos=base.read();
-  if (base_pos>179){
-    girando_reloj=0;
-  }
-  else if (base_pos<1) {
-    girando_reloj=1;
-  }
-  if (girando_reloj==1) {
-    Braccio.ServoMovement (5, base.read()+base_girar, shoulder_buscar, elbow_buscar, wrist_rot_home, wrist_ver_home, gripper_abrir);
-  }
-  else {
-    Braccio.ServoMovement (5, base.read()-base_girar, shoulder_buscar, elbow_buscar, wrist_rot_home, wrist_ver_home, gripper_abrir);
-  }
+void pos_dejar(){
+  Braccio.ServoMovement(500, base_dejar, shoulder_dejar, elbow_dejar, wrist_rot_dejar, wrist_ver_dejar, gripper.read());
 }
 
 //Función de detectar distancia
@@ -103,15 +64,35 @@ int medirDistancia(){
 }
 
 void setup() {
-  Braccio.begin();
   Serial.begin(9600);
   pinMode(TRIG, OUTPUT);
   pinMode(ECO, INPUT);
-  mover_pos_ini();
+  Braccio.begin();
+  abrir_pinza();
+  pos_coger();
+  Serial.println("Presione cualquier tecla para comenzar");
+  while (!Serial.available()){
+    delay(100); //Espera a que se le envíe algo por monitor serie
+  }
+  pos_dejar();
 }
 void loop() {
-  abrir_pinza();
-  barrido_robot();
+  int d = medirDistancia();
+  Serial.println(d);
+  if (d<=d_max && d>=d_min){
+    pos_coger();
+    cerrar_pinza();
+    pos_dejar();
+    d = medirDistancia();
+    while (d<d_min || d>d_max){
+      //Se queda en este bucle hasta que alguien pase la mano por debajo
+      delay(50);
+      d=medirDistancia();
+      Serial.println(d);
+    }
+    //Cuando alguien pasa la mano por debajo, debe soltar la bola
+    abrir_pinza();
+  }
   delay(50);
 }
 
