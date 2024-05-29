@@ -69,11 +69,6 @@ void setup() {
   pinMode(ECO, INPUT);
   Braccio.begin();
   abrir_pinza();
-  pos_coger();
-  Serial.println("Presione cualquier tecla para comenzar");
-  while (!Serial.available()){
-    delay(100); //Espera a que se le envíe algo por monitor serie
-  }
   pos_dejar();
 }
 void loop() {
